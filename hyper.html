@@ -1,0 +1,844 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hyper OS</title>
+    
+    <!-- Google Fonts: Orbitron -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400..900&display=swap" rel="stylesheet">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- React/Babel for Preview Rendering -->
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        body { 
+            background-color: #09090b; 
+            color: #e4e4e7; 
+            font-family: 'Orbitron', sans-serif; 
+            overflow: hidden; 
+        }
+        
+        h1, h2, h3, button, span, input { font-family: 'Orbitron', sans-serif; }
+
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #18181b; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+
+        .fade-in { animation: fadeIn 0.2s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        
+        .hidden { display: none !important; }
+
+        .font-code { 
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace !important; 
+        }
+
+        #ide-logs div { margin-bottom: 2px; }
+        
+        .orbitron-heavy { font-weight: 900; letter-spacing: 0.1em; }
+
+        /* AI Message Bubble styling */
+        .ai-msg { border-left: 2px solid #6366f1; }
+        .user-msg { border-right: 2px solid #3f3f46; }
+    </style>
+</head>
+<body class="h-screen w-screen flex flex-col">
+
+    <!-- ================= DASHBOARD VIEW ================= -->
+    <div id="view-dashboard" class="flex-1 flex flex-col p-4 md:p-8 overflow-y-auto">
+        <header class="max-w-6xl mx-auto w-full mb-8 flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+                <h1 class="text-3xl orbitron-heavy text-white">HYPER OS</h1>
+                <p class="text-zinc-400 mt-1 text-xs tracking-widest uppercase">Central Intelligence Console</p>
+            </div>
+            <div class="flex items-center gap-3 w-full md:w-auto">
+                <div class="relative flex-1 md:w-64">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500"></i>
+                    <input type="text" placeholder="SEARCH MODULES..." class="flex h-10 w-full rounded border border-zinc-800 bg-zinc-900/50 px-3 py-2 pl-9 text-[10px] text-zinc-100 placeholder:text-zinc-500 focus:outline-none focus:border-zinc-700 transition-all uppercase tracking-widest">
+                </div>
+            </div>
+        </header>
+
+        <div class="max-w-6xl mx-auto w-full grid grid-cols-1 md:grid-cols-3 auto-rows-[200px] gap-4 md:gap-6 pb-12">
+            <!-- Hyper IDE Card -->
+            <div onclick="switchView('ide')" class="md:col-span-2 group rounded border border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900/60 backdrop-blur-sm p-6 flex flex-col justify-between h-full cursor-pointer transition-all hover:border-zinc-700 hover:scale-[1.01]">
+                <div class="space-y-4">
+                    <div class="flex items-start justify-between">
+                        <div class="p-2 rounded bg-zinc-800/50 border border-zinc-700/50">
+                            <i data-lucide="code" class="w-6 h-6 text-indigo-400"></i>
+                        </div>
+                        <div class="flex items-center gap-1.5 px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20">
+                            <span class="relative flex h-1.5 w-1.5">
+                                <span class="animate-ping absolute inline-flex h-full w-full rounded bg-emerald-400 opacity-75"></span>
+                                <span class="relative inline-flex rounded h-1.5 w-1.5 bg-emerald-500"></span>
+                            </span>
+                            <span class="text-[9px] font-bold text-emerald-500 uppercase tracking-tighter">Online</span>
+                        </div>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-zinc-100 tracking-wider">HYPER IDE</h2>
+                        <p class="text-zinc-500 text-[11px] mt-1 leading-relaxed uppercase tracking-wide">Iterative AI development environment with live synthesis.</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mt-4">
+                    <span class="text-[10px] font-medium text-zinc-600 group-hover:text-zinc-300 transition-colors uppercase tracking-widest">System v3.4 Stable</span>
+                    <div class="h-8 w-8 inline-flex items-center justify-center rounded bg-zinc-800 text-zinc-100 group-hover:bg-white group-hover:text-black transition-colors">
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Smart Vault Card -->
+            <div onclick="switchView('vault')" class="md:col-span-1 group rounded border border-zinc-800 bg-zinc-900/30 hover:bg-zinc-900/60 backdrop-blur-sm p-6 flex flex-col justify-between h-full cursor-pointer transition-all hover:border-zinc-700 hover:scale-[1.01]">
+                <div class="space-y-4">
+                    <div class="p-2 rounded bg-zinc-800/50 border border-zinc-700/50 w-fit">
+                        <i data-lucide="layers" class="w-6 h-6 text-emerald-400"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-xl font-bold text-zinc-100 tracking-wider">SMART VAULT</h2>
+                        <p class="text-zinc-500 text-[11px] mt-1 uppercase tracking-wide">Encrypted asset storage.</p>
+                    </div>
+                </div>
+                <div class="flex items-center justify-between mt-4">
+                    <span class="text-[10px] font-medium text-zinc-600 group-hover:text-zinc-300 transition-colors uppercase tracking-widest">Sync Active</span>
+                    <div class="h-8 w-8 inline-flex items-center justify-center rounded bg-zinc-800 text-zinc-100 group-hover:bg-white group-hover:text-black transition-colors">
+                        <i data-lucide="arrow-right" class="w-4 h-4"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- GitHub Card -->
+            <div class="md:col-span-3 mt-4 group rounded-xl border border-zinc-800 bg-gradient-to-r from-zinc-900/50 to-black p-6 flex flex-col md:flex-row items-center justify-between cursor-pointer hover:border-zinc-700 transition-all">
+                <div class="flex items-center gap-6 mb-4 md:mb-0">
+                    <div class="p-4 rounded-full bg-zinc-800 border border-zinc-700">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8 text-white"><path d="M15 22v-4a4.8 4.8 0 0 0-1-3.5c3 0 6-2 6-5.5.08-1.25-.27-2.48-1-3.5.28-1.15.28-2.35 0-3.5 0 0-1 0-3 1.5-2.64-.5-5.36-.5-8 0C6 2 5 2 5 2c-.3 1.15-.3 2.35 0 3.5A5.403 5.403 0 0 0 4 9c0 3.5 3 5.5 6 5.5-.39.49-.68 1.05-.85 1.65-.17.6-.22 1.23-.15 1.85v4" /><path d="M9 18c-4.51 2-5-2-7-2" /></svg>
+                    </div>
+                    <div class="text-center md:text-left">
+                        <h2 class="text-xl font-bold text-white tracking-widest uppercase">Deployment Terminal</h2>
+                        <p class="text-zinc-500 text-[10px] mt-1 uppercase tracking-widest">Initialize production push to global edge networks.</p>
+                    </div>
+                </div>
+                <button class="flex items-center gap-2 px-6 py-3 rounded-lg bg-white text-black font-bold text-[10px] hover:bg-zinc-200 transition-colors uppercase tracking-widest">
+                    <i data-lucide="rocket" class="w-4 h-4"></i>
+                    <span>Execute Deploy</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= IDE VIEW ================= -->
+    <div id="view-ide" class="flex-1 flex flex-col h-full bg-black text-zinc-300 hidden relative">
+        <!-- Vault Picker Modal -->
+        <div id="ide-vault-modal" class="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-lg w-full max-w-2xl shadow-2xl flex flex-col max-h-[80vh]">
+                <div class="flex justify-between items-center p-4 border-b border-zinc-800">
+                    <h3 class="text-white font-bold text-xs uppercase tracking-widest flex items-center gap-2"><i data-lucide="folder-open" class="w-4 h-4"></i> Vault Retrieval</h3>
+                    <button onclick="toggleVaultPicker(false)"><i data-lucide="x" class="w-4 h-4"></i></button>
+                </div>
+                <div id="ide-vault-list" class="flex-1 overflow-y-auto p-4 grid grid-cols-2 md:grid-cols-3 gap-3">
+                    <!-- Files injected here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Save Project Modal -->
+        <div id="ide-save-modal" class="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+            <div class="bg-zinc-900 border border-zinc-800 rounded-lg w-full max-w-sm shadow-2xl p-6">
+                <h3 class="text-white font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2">
+                    <i data-lucide="save" class="w-4 h-4 text-emerald-500"></i> Vault Committal
+                </h3>
+                <p class="text-[10px] text-zinc-500 uppercase tracking-widest mb-4">Define Project Designation:</p>
+                <input id="ide-save-name" type="text" placeholder="PROJECT_ALPHA" class="w-full bg-black border border-zinc-800 rounded p-3 text-[11px] text-white focus:outline-none focus:border-emerald-500 uppercase tracking-widest mb-6">
+                <div class="flex gap-3">
+                    <button onclick="toggleSaveModal(false)" class="flex-1 px-4 py-2 border border-zinc-800 text-[10px] font-bold uppercase tracking-widest hover:bg-zinc-800 transition-colors rounded">Cancel</button>
+                    <button onclick="executeSave()" class="flex-1 px-4 py-2 bg-emerald-600 text-white text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-500 transition-colors rounded">Commit</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- IDE Header -->
+        <header class="h-12 border-b border-zinc-900 flex items-center justify-between px-4 bg-black shrink-0">
+            <div class="flex items-center gap-4">
+                <button onclick="switchView('dashboard')" class="p-2 hover:bg-zinc-900 rounded-lg text-zinc-400 hover:text-white transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </button>
+                <div class="flex items-center gap-2 text-white font-bold tracking-widest text-xs">
+                    <i data-lucide="code" class="w-4 h-4 text-indigo-500"></i>
+                    <span>HYPER IDE</span>
+                </div>
+                <div id="ide-status" class="text-[9px] px-2 py-0.5 rounded border border-emerald-500/30 text-emerald-500 bg-zinc-900/50 uppercase tracking-tighter">Active</div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="toggleSaveModal(true)" class="flex items-center gap-2 px-3 py-1.5 rounded hover:bg-zinc-900 text-emerald-500 border border-emerald-950/50" title="Commit to Vault">
+                    <i data-lucide="save" class="w-4 h-4"></i>
+                    <span class="text-[9px] font-bold uppercase tracking-widest hidden md:inline">Save</span>
+                </button>
+                <button onclick="toggleChat()" class="p-2 rounded hover:bg-zinc-900 text-white ml-2" title="AI Link">
+                    <i data-lucide="message-square" class="w-4 h-4"></i>
+                </button>
+            </div>
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Sidebar Tools -->
+            <aside class="w-12 border-r border-zinc-900 flex flex-col items-center py-4 gap-4 bg-black shrink-0">
+                <button onclick="setIdeTab('editor')" class="p-2 rounded bg-zinc-800 text-white" title="Editor"><i data-lucide="file-code" class="w-4 h-4"></i></button>
+                <button onclick="setIdeTab('preview')" class="p-2 rounded text-zinc-600 hover:text-white" title="Monitor"><i data-lucide="monitor" class="w-4 h-4"></i></button>
+                <button onclick="loadVaultFilesForIde()" class="p-2 rounded text-zinc-600 hover:text-white" title="Vault"><i data-lucide="folder-open" class="w-4 h-4"></i></button>
+            </aside>
+
+            <!-- Main Content Area -->
+            <div class="flex-1 flex flex-col min-w-0 bg-zinc-950 relative">
+                <div class="flex-1 relative">
+                    <textarea id="ide-editor" class="w-full h-full bg-zinc-950 text-zinc-300 font-code text-[13px] p-4 resize-none focus:outline-none" spellcheck="false" placeholder="// Initializing script..."></textarea>
+                    <iframe id="ide-preview" class="w-full h-full bg-white border-none hidden" sandbox="allow-scripts"></iframe>
+                </div>
+                
+                <!-- Terminal -->
+                <div id="ide-terminal" class="h-32 bg-black border-t border-zinc-900 overflow-y-auto p-2 font-code text-[10px] text-zinc-500">
+                    <div class="flex justify-between items-center mb-2 px-1 sticky top-0 bg-black border-b border-zinc-900/50 pb-1">
+                        <span class="uppercase font-bold tracking-widest text-[9px] font-orbitron text-zinc-400">System Log</span>
+                    </div>
+                    <div id="ide-logs"></div>
+                </div>
+            </div>
+
+            <!-- Chat Panel -->
+            <div id="ide-chat-panel" class="w-80 bg-zinc-950 border-l border-zinc-900 flex flex-col">
+                <div class="h-10 border-b border-zinc-900 flex items-center justify-between px-3 bg-black">
+                    <span class="text-[10px] font-bold uppercase text-zinc-400 tracking-widest">OS AI Assistant</span>
+                    <button onclick="toggleChat()"><i data-lucide="panel-right-close" class="w-3 h-3 text-zinc-600"></i></button>
+                </div>
+                <div id="ide-chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4">
+                    <!-- Messages -->
+                </div>
+                <div class="p-3 border-t border-zinc-900 bg-black">
+                    <form onsubmit="handleGenerate(event)" class="relative">
+                        <input id="ide-chat-input" class="w-full bg-zinc-900 border border-zinc-800 rounded p-2 pr-8 text-[11px] text-white focus:outline-none focus:border-indigo-500 transition-colors uppercase tracking-tight" placeholder="INITIALIZE PROMPT...">
+                        <button type="submit" class="absolute right-2 top-2 text-zinc-500 hover:text-white">
+                            <i data-lucide="send" class="w-3 h-3"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= VAULT VIEW ================= -->
+    <div id="view-vault" class="flex-1 flex flex-col bg-slate-950 text-slate-200 hidden h-full overflow-hidden">
+        <header class="h-14 bg-slate-950 border-b border-slate-800 flex items-center justify-between px-4 shrink-0 z-20">
+            <div class="flex items-center gap-4">
+                <button onclick="switchView('dashboard')" class="p-2 hover:bg-slate-900 rounded-lg text-slate-400 hover:text-white transition-colors">
+                    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+                </button>
+                <div class="flex items-center gap-3 border-l border-slate-800 pl-4">
+                    <i data-lucide="layers" class="w-5 h-5 text-emerald-500"></i>
+                    <h1 class="font-bold text-xs tracking-widest text-white hidden md:block uppercase">
+                        HYPER VAULT
+                    </h1>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 flex-1 max-w-xl mx-4">
+                <div class="relative flex-1 group">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 h-3 w-3 text-slate-600"></i>
+                    <input id="vault-search" type="text" placeholder="QUERY ASSETS..." class="w-full pl-9 pr-4 py-1.5 bg-slate-900 border border-slate-800 text-[10px] text-emerald-100 focus:outline-none focus:border-emerald-500/50 transition-all tracking-widest rounded uppercase">
+                </div>
+            </div>
+            <button onclick="document.getElementById('vault-file-input').click()" class="flex items-center gap-2 bg-emerald-600/10 border border-emerald-500/50 hover:bg-emerald-600 hover:text-white text-emerald-500 px-4 py-1.5 text-[10px] font-bold uppercase tracking-widest transition-all rounded">
+                <i data-lucide="upload" class="w-3 h-3"></i>
+                <span class="hidden md:inline">Import</span>
+            </button>
+            <input type="file" id="vault-file-input" class="hidden" multiple onchange="processVaultFiles(this.files)">
+        </header>
+
+        <div class="flex-1 flex overflow-hidden">
+            <!-- Vault Sidebar -->
+            <aside class="w-64 bg-slate-950 border-r border-slate-800 hidden md:flex flex-col">
+                <div class="p-4">
+                    <div class="text-[9px] font-bold text-slate-600 uppercase tracking-[0.3em] mb-4 px-2">Data Library</div>
+                    <button class="w-full flex items-center gap-3 px-3 py-2 text-[10px] bg-slate-900 border border-emerald-500/30 text-emerald-400 mb-2 rounded uppercase tracking-widest font-bold">
+                        <i data-lucide="grid-3x3" class="w-4 h-4"></i>
+                        <span>REPOSITORY</span>
+                        <span id="vault-count" class="ml-auto text-[8px] bg-slate-950 px-1.5 rounded border border-slate-800">0</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Vault Grid -->
+            <main class="flex-1 overflow-y-auto p-6">
+                <div id="vault-loading" class="hidden mb-6 bg-emerald-500/10 border border-emerald-500/20 p-4 flex items-center gap-3 text-emerald-400 text-[10px] tracking-widest animate-pulse rounded">
+                    <i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> SYNCING LOCAL ASSETS TO CLOUD CORE...
+                </div>
+                
+                <div id="vault-grid" class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                    <!-- Files injected here -->
+                </div>
+                <div id="vault-empty" class="hidden col-span-full py-12 text-center">
+                    <i data-lucide="folder" class="h-12 w-12 text-slate-800 mx-auto mb-3"></i>
+                    <p class="text-slate-600 text-[10px] uppercase tracking-widest">Repository Offline</p>
+                </div>
+            </main>
+
+            <!-- Vault Details Panel -->
+            <aside id="vault-details" class="w-80 bg-slate-950 border-l border-slate-800 flex flex-col shadow-2xl z-30 hidden">
+                <div class="h-14 border-b border-slate-800 flex items-center justify-between px-6 shrink-0">
+                    <span class="text-[9px] font-bold text-emerald-500 uppercase tracking-[0.4em]">Metadata</span>
+                    <button onclick="closeDetails()"><i data-lucide="x" class="w-4 h-4 text-slate-600 hover:text-white"></i></button>
+                </div>
+                <div class="p-6 overflow-y-auto flex-1">
+                    <div class="aspect-video bg-slate-900 border border-slate-800 relative group overflow-hidden mb-6 rounded">
+                        <iframe id="details-preview" class="w-[200%] h-[200%] transform scale-50 origin-top-left pointer-events-none opacity-50 bg-white"></iframe>
+                        <div class="absolute inset-0 bg-slate-950/60 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                            <button onclick="openFullscreenPreview()" class="bg-emerald-600 text-white px-4 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-emerald-500 transition-colors rounded">Initialize</button>
+                        </div>
+                    </div>
+                    <h2 id="details-name" class="text-lg font-bold text-white tracking-widest mb-1 truncate uppercase">File</h2>
+                    <span id="details-id" class="text-[8px] font-code text-slate-500 uppercase tracking-tighter">ID: Unknown</span>
+                    
+                    <div class="mt-6 space-y-4">
+                        <div class="bg-slate-900 p-3 border border-slate-800 rounded">
+                            <span class="text-[8px] text-slate-600 uppercase font-bold block mb-1 tracking-widest">Type Classification</span>
+                            <span id="details-type" class="text-slate-300 text-[10px] font-code uppercase">Unknown</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="p-4 border-t border-slate-800">
+                    <div id="details-actions" class="grid grid-cols-2 gap-3">
+                        <button onclick="showDeleteConfirm()" class="bg-red-950/20 text-red-500 border border-red-900/30 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-red-900/30 transition-colors rounded">Purge</button>
+                        <button class="bg-slate-900 text-slate-300 border border-slate-800 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-slate-800 transition-colors rounded">Export</button>
+                    </div>
+                    <div id="details-confirm" class="bg-red-950/30 border border-red-500/30 p-3 rounded mb-2 hidden">
+                        <p class="text-red-400 text-[10px] font-bold mb-2 tracking-widest">PERMANENT PURGE?</p>
+                        <div class="flex gap-2">
+                            <button onclick="confirmDelete()" class="flex-1 bg-red-600 hover:bg-red-500 text-white text-[9px] font-bold py-1.5 rounded uppercase tracking-widest">CONFIRM</button>
+                            <button onclick="cancelDelete()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-[9px] font-bold py-1.5 rounded uppercase tracking-widest">CANCEL</button>
+                        </div>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <!-- Fullscreen Preview Overlay -->
+    <div id="fullscreen-preview" class="fixed inset-0 z-50 bg-slate-950 flex flex-col hidden animate-in fade-in zoom-in duration-200">
+        <div class="h-12 border-b border-slate-800 flex items-center justify-between px-6 bg-slate-950">
+            <div class="flex items-center gap-3">
+                <i data-lucide="terminal" class="h-4 w-4 text-emerald-500"></i>
+                <span id="fullscreen-title" class="font-bold text-white text-[10px] tracking-[0.2em] uppercase">Monitor</span>
+            </div>
+            <button onclick="closeFullscreenPreview()" class="text-slate-400 hover:text-white flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest">
+                <i data-lucide="minimize-2" class="w-4 h-4"></i> DISCONNECT
+            </button>
+        </div>
+        <iframe id="fullscreen-iframe" class="flex-1 w-full bg-white border-none"></iframe>
+    </div>
+
+    <!-- MAIN SCRIPT -->
+    <script type="module">
+        // --- FIREBASE IMPORTS ---
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js';
+        import { getAuth, signInAnonymously, onAuthStateChanged, signInWithCustomToken } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js';
+        import { getFirestore, collection, addDoc, deleteDoc, doc, onSnapshot, query, getDocs } from 'https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js';
+
+        // --- GLOBAL VARIABLES ---
+        let app, auth, db;
+        let currentUser = null;
+        let currentFile = null;
+        let vaultFiles = [];
+        let isGenerating = false;
+        
+        // Configuration
+        const getFirebaseConfig = () => {
+            try {
+                if (typeof __firebase_config !== 'undefined') return JSON.parse(__firebase_config);
+            } catch (e) { console.warn('Config parse failed'); }
+            return {};
+        };
+        const firebaseConfig = getFirebaseConfig();
+        const appId = (typeof __app_id !== 'undefined' ? __app_id : 'default-app-id');
+
+        // Init Firebase
+        if (Object.keys(firebaseConfig).length > 0) {
+            app = initializeApp(firebaseConfig);
+            auth = getAuth(app);
+            db = getFirestore(app);
+            
+            const initAuth = async () => {
+                try {
+                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                        await signInWithCustomToken(auth, __initial_auth_token);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                } catch (err) {
+                    addLog("AUTH_ERROR: Persistent uplink failed.");
+                }
+            };
+            initAuth();
+            
+            onAuthStateChanged(auth, (user) => {
+                currentUser = user;
+                if (user) {
+                    setupVaultListener();
+                    addLog('HYPER OS CORE: Uplink established.');
+                }
+            });
+        }
+
+        // --- VIEW MANAGEMENT ---
+        window.switchView = (viewId) => {
+            document.getElementById('view-dashboard').classList.add('hidden');
+            document.getElementById('view-ide').classList.add('hidden');
+            document.getElementById('view-vault').classList.add('hidden');
+            
+            document.getElementById(`view-${viewId}`).classList.remove('hidden');
+            lucide.createIcons(); 
+        };
+
+        // --- IDE LOGIC ---
+        const defaultCode = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Hyper OS Monitor</title>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+<style>
+    body { background-color: #09090b; color: #e4e4e7; font-family: 'Orbitron', sans-serif; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .container { text-align: center; border: 1px solid #27272a; padding: 3rem; border-radius: 4px; background: #0c0c0e; box-shadow: 0 0 40px rgba(16, 185, 129, 0.05); }
+    h1 { font-size: 1.2rem; margin-bottom: 1rem; color: #fff; display: flex; align-items: center; gap: 15px; letter-spacing: 0.2em; }
+    .dot { width: 10px; height: 10px; background: #10b981; border-radius: 50%; display: inline-block; box-shadow: 0 0 15px #10b981; animation: pulse 2s infinite; }
+    p { color: #52525b; font-size: 10px; letter-spacing: 0.1em; }
+    @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.3; } 100% { opacity: 1; } }
+</style>
+</head>
+<body>
+<div class="container">
+    <h1><span class="dot"></span>RUNTIME ACTIVE</h1>
+    <p>WAITING FOR INSTRUCTIONS...</p>
+</div>
+</body>
+</html>`;
+
+        let codeContent = defaultCode;
+        let chatHistory = [{ role: 'ai', text: 'HYPER OS AI: Iterative synthesis engine active. I now remember your existing code and can modify it incrementally.' }];
+
+        document.getElementById('ide-editor').value = codeContent;
+        
+        window.setIdeTab = (tab) => {
+            const editor = document.getElementById('ide-editor');
+            const preview = document.getElementById('ide-preview');
+            const btns = document.querySelectorAll('aside button');
+            
+            if (tab === 'editor') {
+                editor.classList.remove('hidden');
+                preview.classList.add('hidden');
+                btns[0].classList.add('bg-zinc-800', 'text-white');
+                btns[0].classList.remove('text-zinc-600');
+                btns[1].classList.remove('bg-zinc-800', 'text-white');
+                btns[1].classList.add('text-zinc-600');
+            } else {
+                editor.classList.add('hidden');
+                preview.classList.remove('hidden');
+                updatePreview();
+                btns[1].classList.add('bg-zinc-800', 'text-white');
+                btns[1].classList.remove('text-zinc-600');
+                btns[0].classList.remove('bg-zinc-800', 'text-white');
+                btns[0].classList.add('text-zinc-600');
+            }
+        };
+
+        function updatePreview() {
+            const content = document.getElementById('ide-editor').value;
+            codeContent = content;
+            document.getElementById('ide-preview').srcdoc = content;
+        }
+
+        document.getElementById('ide-editor').addEventListener('input', updatePreview);
+
+        window.toggleChat = () => {
+            const panel = document.getElementById('ide-chat-panel');
+            panel.classList.toggle('hidden');
+        };
+
+        window.toggleSaveModal = (show) => {
+            const modal = document.getElementById('ide-save-modal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        };
+
+        window.executeSave = async () => {
+            const nameInput = document.getElementById('ide-save-name');
+            const projectName = nameInput.value.trim().toUpperCase() || "UNNAMED_PROJECT";
+            const content = document.getElementById('ide-editor').value;
+
+            if (!currentUser) {
+                addLog("SAVE_ERROR: Authentication required for Vault storage.");
+                return;
+            }
+
+            addLog(`SAVE_INIT: Committing ${projectName} to Cloud Core...`);
+            toggleSaveModal(false);
+
+            try {
+                const analysis = analyzeContent(content, projectName + ".html");
+                await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'files'), {
+                    originalName: projectName + ".html",
+                    ...analysis,
+                    name: projectName,
+                    content: content,
+                    uploadDate: new Date().toISOString()
+                });
+                addLog(`SAVE_SUCCESS: ${projectName} persistent state secured.`);
+                nameInput.value = "";
+            } catch (err) {
+                console.error(err);
+                addLog("SAVE_CRITICAL: Uplink dropped during committal.");
+            }
+        };
+
+        function addLog(msg) {
+            const div = document.getElementById('ide-logs');
+            const time = new Date().toLocaleTimeString('en-US', { hour12: false });
+            const p = document.createElement('div');
+            p.innerText = `[${time}] ${msg}`;
+            div.appendChild(p);
+            div.scrollTop = div.scrollHeight;
+        }
+
+        function renderChat() {
+            const container = document.getElementById('ide-chat-messages');
+            container.innerHTML = '';
+            chatHistory.forEach(m => {
+                const row = document.createElement('div');
+                row.className = `flex gap-2 ${m.role === 'user' ? 'flex-row-reverse' : ''}`;
+                row.innerHTML = `
+                    <div class="w-6 h-6 rounded flex items-center justify-center shrink-0 ${m.role === 'ai' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-zinc-800 text-zinc-400'}">
+                        ${m.role === 'ai' ? '<i data-lucide="bot" class="w-3 h-3"></i>' : '<span class="text-[8px] font-bold">USER</span>'}
+                    </div>
+                    <div class="text-[10px] p-2 rounded border leading-relaxed ${m.role === 'user' ? 'bg-zinc-900 border-zinc-800' : 'bg-black border-zinc-900 text-zinc-500'} ${m.role === 'ai' ? 'ai-msg' : 'user-msg'}">
+                        ${m.text}
+                    </div>
+                `;
+            });
+            container.innerHTML = chatHistory.map(m => `
+                <div class="flex gap-2 ${m.role === 'user' ? 'flex-row-reverse' : ''}">
+                    <div class="w-6 h-6 rounded flex items-center justify-center shrink-0 ${m.role === 'ai' ? 'bg-indigo-500/20 text-indigo-400' : 'bg-zinc-800 text-zinc-400'}">
+                        ${m.role === 'ai' ? '<i data-lucide="bot" class="w-3 h-3"></i>' : '<span class="text-[8px] font-bold">USER</span>'}
+                    </div>
+                    <div class="text-[10px] p-2 rounded border leading-relaxed ${m.role === 'user' ? 'bg-zinc-900 border-zinc-800' : 'bg-black border-zinc-900 text-zinc-500'} ${m.role === 'ai' ? 'ai-msg' : 'user-msg'}">
+                        ${m.text}
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+            container.scrollTop = container.scrollHeight;
+        }
+
+        renderChat();
+
+        // --- AI ITERATIVE SYNTHESIS LOGIC ---
+        const apiKey = ""; 
+        const modelName = "gemini-2.5-flash-preview-09-2025";
+        const systemPrompt = "You are Hyper OS AI. You are an expert web developer specializing in single-file web applications. " +
+                             "If existing code is provided, you MUST modify/iterate on it based on user instructions. " +
+                             "If no code is provided, generate a new app. Return ONLY the full updated HTML code. " +
+                             "No markdown blocks, no intro/outro, no formatting. Use Tailwind CSS and Orbitron font for headers.";
+
+        async function fetchWithRetry(prompt, retries = 5, delay = 1000) {
+            const currentCode = document.getElementById('ide-editor').value;
+            const fullPrompt = currentCode.trim() && currentCode !== defaultCode ? 
+                               `The current code is:\n\n${currentCode}\n\nUser Instruction: ${prompt}` : prompt;
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+            const payload = {
+                contents: [{ parts: [{ text: fullPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] }
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (!response.ok) {
+                    if (retries > 0) {
+                        await new Promise(resolve => setTimeout(resolve, delay));
+                        return fetchWithRetry(prompt, retries - 1, delay * 2);
+                    }
+                    throw new Error(`HTTP_${response.status}`);
+                }
+
+                const data = await response.json();
+                const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+                if (!text) throw new Error("SYNTHESIS_VOID");
+                return text;
+            } catch (error) {
+                if (retries > 0) {
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                    return fetchWithRetry(prompt, retries - 1, delay * 2);
+                }
+                throw error;
+            }
+        }
+
+        window.handleGenerate = async (e) => {
+            e.preventDefault();
+            const input = document.getElementById('ide-chat-input');
+            const prompt = input.value.trim();
+            if (!prompt || isGenerating) return;
+
+            chatHistory.push({ role: 'user', text: prompt });
+            renderChat();
+            input.value = '';
+            isGenerating = true;
+            document.getElementById('ide-status').innerText = 'REFACTORING';
+            document.getElementById('ide-status').className = "text-[9px] px-2 py-0.5 rounded border border-yellow-500/30 text-yellow-500 bg-zinc-900/50 uppercase tracking-tighter";
+            addLog(`ITERATION_START: Synthesizing request with current codebase...`);
+
+            try {
+                const generatedCode = await fetchWithRetry(prompt);
+                let cleanedCode = generatedCode.trim();
+                
+                // Extra cleaning for potential markdown wrapper
+                if (cleanedCode.startsWith('```')) {
+                    cleanedCode = cleanedCode.replace(/^```[a-z]*\n/i, '').replace(/\n```$/i, '');
+                }
+
+                document.getElementById('ide-editor').value = cleanedCode;
+                updatePreview();
+                setIdeTab('preview');
+                chatHistory.push({ role: 'ai', text: 'HYPER OS AI: Code refactored successfully. Preview updated.' });
+                addLog('PROCESS_COMPLETE: Incremental logic applied.');
+
+            } catch (err) {
+                console.error(err);
+                chatHistory.push({ role: 'ai', text: 'HYPER OS AI: Refactor failed. Context too complex or signal unstable.' });
+                addLog('ERROR_PIPE: Iteration timed out.');
+            } finally {
+                isGenerating = false;
+                document.getElementById('ide-status').innerText = 'Active';
+                document.getElementById('ide-status').className = "text-[9px] px-2 py-0.5 rounded border border-emerald-500/30 text-emerald-500 bg-zinc-900/50 uppercase tracking-tighter";
+                renderChat();
+            }
+        };
+
+        // --- VAULT LOGIC ---
+        function setupVaultListener() {
+            if (!currentUser || !db) return;
+            const q = query(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'files'));
+            onSnapshot(q, (snapshot) => {
+                const docs = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+                docs.sort((a, b) => new Date(b.uploadDate) - new Date(a.uploadDate));
+                vaultFiles = docs;
+                renderVault();
+            }, (error) => {
+                addLog("ACCESS_DENIED: Secure storage restricted.");
+            });
+        }
+
+        function generatePreview(file) {
+            if (!file || !file.content) return '';
+            if (file.type === 'html') return file.content;
+            if (file.type === 'react') {
+                let cleanCode = file.content
+                    .replace(/import\s+[\s\S]*?from\s+['"].*?['"];?/g, '')
+                    .replace(/export\s+default\s+function\s+(\w+)/, `window.$1 = function $1`)
+                    .replace(/export\s+default\s+/g, '')
+                    .replace(/module\.exports\s*=\s*/g, '');
+                
+                let componentName = 'App';
+                const match = cleanCode.match(/function\s+(\w+)/);
+                if(match) componentName = match[1];
+
+                return `<!DOCTYPE html><html><head>
+                        <script src="[https://unpkg.com/react@18/umd/react.production.min.js](https://unpkg.com/react@18/umd/react.production.min.js)"><\/script>
+                        <script src="[https://unpkg.com/react-dom@18/umd/react-dom.production.min.js](https://unpkg.com/react-dom@18/umd/react-dom.production.min.js)"><\/script>
+                        <script src="[https://unpkg.com/@babel/standalone/babel.min.js](https://unpkg.com/@babel/standalone/babel.min.js)"><\/script>
+                        <script src="[https://cdn.tailwindcss.com](https://cdn.tailwindcss.com)"><\/script>
+                        <link href="[https://fonts.googleapis.com/css2?family=Orbitron&display=swap](https://fonts.googleapis.com/css2?family=Orbitron&display=swap)" rel="stylesheet">
+                        <style>body{background:#020617;color:#e2e8f0;margin:0;font-family:'Orbitron', sans-serif;display:flex;align-items:center;justify-content:center;height:100vh;}</style></head>
+                        <body><div id="root"></div><script type="text/babel">
+                            try {
+                                ${cleanCode}
+                                const root = ReactDOM.createRoot(document.getElementById('root'));
+                                const Target = window['${componentName}'] || window.App || (() => <div>Component Error</div>);
+                                root.render(<Target />);
+                            } catch (e) { document.body.innerHTML = '<div style=\"color:red;padding:20px\">'+e.message+'</div>'; }
+                        <\/script></body></html>`;
+            }
+            return file.content;
+        }
+
+        function analyzeContent(content, filename) {
+            let type = "html";
+            if (filename.endsWith('.jsx') || filename.endsWith('.tsx') || content.includes('react')) {
+                type = 'react';
+            }
+            return {
+                name: filename.split('.')[0] || 'UNNAMED',
+                type: type
+            };
+        }
+
+        window.processVaultFiles = async (fileList) => {
+            if (!currentUser) return;
+            document.getElementById('vault-loading').classList.remove('hidden');
+            try {
+                for (const fileObj of Array.from(fileList)) {
+                    const text = await fileObj.text();
+                    const analysis = analyzeContent(text, fileObj.name);
+                    await addDoc(collection(db, 'artifacts', appId, 'users', currentUser.uid, 'files'), {
+                        originalName: fileObj.name,
+                        ...analysis,
+                        content: text,
+                        uploadDate: new Date().toISOString()
+                    });
+                }
+            } catch (e) { console.error(e); }
+            finally { document.getElementById('vault-loading').classList.add('hidden'); }
+        };
+
+        function renderVault() {
+            const grid = document.getElementById('vault-grid');
+            const search = document.getElementById('vault-search').value.toLowerCase();
+            document.getElementById('vault-count').innerText = vaultFiles.length;
+            
+            grid.innerHTML = '';
+            const filtered = vaultFiles.filter(f => (f.name||'').toLowerCase().includes(search));
+            
+            if (filtered.length === 0) {
+                document.getElementById('vault-empty').classList.remove('hidden');
+            } else {
+                document.getElementById('vault-empty').classList.add('hidden');
+                filtered.forEach(file => {
+                    const el = document.createElement('div');
+                    el.className = `group bg-slate-900 border border-slate-800 hover:border-slate-500 cursor-pointer overflow-hidden transition-all rounded p-3`;
+                    el.onclick = () => selectFile(file);
+                    
+                    const icon = file.type === 'react' ? 'layout' : 'file-code';
+                    
+                    el.innerHTML = `
+                        <div class="h-20 bg-slate-950/50 border-b border-slate-800 flex items-center justify-center mb-3">
+                            <i data-lucide="${icon}" class="h-6 w-6 text-slate-700 group-hover:text-emerald-500 transition-colors"></i>
+                        </div>
+                        <div>
+                            <h3 class="font-bold text-slate-200 text-[9px] uppercase truncate tracking-wider">${file.name}</h3>
+                            <span class="text-[7px] uppercase tracking-widest font-code text-slate-500">${file.type}</span>
+                        </div>
+                    `;
+                    grid.appendChild(el);
+                });
+            }
+            lucide.createIcons();
+        }
+
+        document.getElementById('vault-search').addEventListener('input', renderVault);
+
+        window.selectFile = (file) => {
+            currentFile = file;
+            document.getElementById('vault-details').classList.remove('hidden');
+            document.getElementById('details-name').innerText = file.name;
+            document.getElementById('details-id').innerText = `ID: ${file.id}`;
+            document.getElementById('details-type').innerText = file.type;
+            document.getElementById('details-preview').srcdoc = generatePreview(file);
+            document.getElementById('details-actions').classList.remove('hidden');
+            document.getElementById('details-confirm').classList.add('hidden');
+        };
+
+        window.closeDetails = () => {
+            currentFile = null;
+            document.getElementById('vault-details').classList.add('hidden');
+        };
+
+        window.showDeleteConfirm = () => {
+            document.getElementById('details-actions').classList.add('hidden');
+            document.getElementById('details-confirm').classList.remove('hidden');
+        };
+
+        window.cancelDelete = () => {
+            document.getElementById('details-confirm').classList.add('hidden');
+            document.getElementById('details-actions').classList.remove('hidden');
+        };
+
+        window.confirmDelete = async () => {
+            if (!currentUser || !currentFile) return;
+            try {
+                await deleteDoc(doc(db, 'artifacts', appId, 'users', currentUser.uid, 'files', currentFile.id));
+                closeDetails();
+                addLog(`PURGE_SUCCESS: ${currentFile.name}`);
+            } catch(e) { console.error(e); }
+        };
+
+        window.openFullscreenPreview = () => {
+            if(!currentFile) return;
+            const fs = document.getElementById('fullscreen-preview');
+            fs.classList.remove('hidden');
+            document.getElementById('fullscreen-title').innerText = currentFile.name;
+            document.getElementById('fullscreen-iframe').srcdoc = generatePreview(currentFile);
+        };
+
+        window.closeFullscreenPreview = () => {
+            document.getElementById('fullscreen-preview').classList.add('hidden');
+            document.getElementById('fullscreen-iframe').srcdoc = '';
+        };
+
+        window.loadVaultFilesForIde = () => {
+            if (!currentUser) {
+                addLog('DENIED: Storage link inactive.');
+                return;
+            }
+            document.getElementById('ide-vault-modal').classList.remove('hidden');
+            renderIdeVaultList();
+        };
+
+        window.toggleVaultPicker = (show) => {
+            const modal = document.getElementById('ide-vault-modal');
+            if (show) modal.classList.remove('hidden');
+            else modal.classList.add('hidden');
+        };
+
+        function renderIdeVaultList() {
+            const list = document.getElementById('ide-vault-list');
+            list.innerHTML = '';
+            if (vaultFiles.length === 0) {
+                list.innerHTML = '<div class="col-span-full text-center p-4 text-zinc-600 text-[10px] tracking-widest">DATA_EMPTY</div>';
+                return;
+            }
+            vaultFiles.forEach(file => {
+                const btn = document.createElement('button');
+                btn.className = "flex flex-col items-center p-3 bg-black border border-zinc-800 hover:border-emerald-500 hover:bg-zinc-900 rounded transition-all text-left group";
+                btn.onclick = () => {
+                    document.getElementById('ide-editor').value = file.content;
+                    updatePreview();
+                    toggleVaultPicker(false);
+                    addLog(`RETRIEVED: ${file.name}`);
+                };
+                btn.innerHTML = `
+                    <i data-lucide="file-code" class="w-6 h-6 mb-2 text-zinc-600 group-hover:text-emerald-500"></i>
+                    <span class="text-[9px] font-bold text-zinc-300 truncate w-full text-center tracking-widest">${file.name}</span>
+                `;
+                list.appendChild(btn);
+            });
+            lucide.createIcons();
+        }
+
+        lucide.createIcons();
+    </script>
+</body>
+</html>
+
